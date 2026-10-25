@@ -1,0 +1,83 @@
+{
+ "n_test": 366825,
+ "n_test_shadow": 117970,
+ "variants": {
+  "full": {
+   "log_loss_all": 0.15472927827665622,
+   "log_loss_shadow": 0.41660700997393907,
+   "brier_shadow": 0.1330201803088174
+  },
+  "neutral_catcher_and_umpire": {
+   "log_loss_all": 0.1551266507497518,
+   "log_loss_shadow": 0.41756998235539083,
+   "brier_shadow": 0.13329095285033735
+  },
+  "no_catcher_umpire_pitcher_batter_effects_fit": {
+   "log_loss_all": 0.1554777300137989,
+   "log_loss_shadow": 0.41854523312904596,
+   "brier_shadow": 0.13358929775319744
+  },
+  "base_rate": {
+   "log_loss_all": 0.6243460682430836,
+   "log_loss_shadow": 0.7519678360544476,
+   "brier_shadow": 0.2771782371008933
+  }
+ },
+ "calibration_all": {
+  "n": 366825,
+  "brier": 0.047418591928079006,
+  "log_loss": 0.15472927827665622,
+  "ece_smooth": 0.0028414449713694643,
+  "cal_intercept": 0.01506589473564064,
+  "cal_intercept_lo": -0.0015933614002586844,
+  "cal_intercept_hi": 0.03690706217455957,
+  "cal_slope": 0.9908797793096527,
+  "cal_slope_lo": 0.9814499010993404,
+  "cal_slope_hi": 1.000742201854673
+ },
+ "calibration_shadow": {
+  "n": 117970,
+  "brier": 0.1330201803088174,
+  "log_loss": 0.41660700997393907,
+  "ece_smooth": 0.00750975580004795,
+  "cal_intercept": 0.00523582110764006,
+  "cal_intercept_lo": -0.00901260156064028,
+  "cal_intercept_hi": 0.025121042416232413,
+  "cal_slope": 0.9780292575014496,
+  "cal_slope_lo": 0.9662132242461301,
+  "cal_slope_hi": 0.9893954788043923
+ },
+ "scales": {
+  "catcher": 0.2,
+  "umpire": 0.2,
+  "pitcher": 0.2,
+  "batter": 0.2
+ },
+ "league_strike_value_runs": 0.12352988229441952,
+ "reliability": {
+  "split_half_catcher_train_season": {
+   "n_players": 64,
+   "pearson": 0.7658154023576582,
+   "spearman": 0.7649725274725274,
+   "spearman_brown_full_season": 0.8673787773457711
+  },
+  "split_half_umpire_train_season": {
+   "n_players": 89,
+   "pearson": 0.7465868033824927,
+   "spearman": 0.7056520258767451,
+   "spearman_brown_full_season": 0.8549094747957905
+  },
+  "season_to_season_catcher": {
+   "n_players": 53,
+   "pearson": 0.5542709157213038,
+   "spearman": 0.5001612643122078,
+   "spearman_brown_full_season": 0.7132230425402749
+  },
+  "season_to_season_umpire": {
+   "n_players": 85,
+   "pearson": 0.530473270886223,
+   "spearman": 0.4440883330076217,
+   "spearman_brown_full_season": 0.6932146819905605
+  }
+ }
+}

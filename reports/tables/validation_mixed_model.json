@@ -1,0 +1,11 @@
+{
+ "rows": 117970,
+ "variance_components_sd": {
+  "catcher": 0.17948582709798966,
+  "umpire": 0.20540226364401537
+ },
+ "catcher_spearman": 0.9514191419141913,
+ "catcher_levels": 100,
+ "umpire_spearman": 0.981149936206116,
+ "umpire_levels": 90
+}
