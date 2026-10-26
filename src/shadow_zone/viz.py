@@ -98,6 +98,64 @@ def forest(table: pd.DataFrame, label_col: str, path: str, value="runs_per_150g"
     plt.close(fig)
 
 
+def feature_distributions(df: pd.DataFrame, path: str, shadow_ft: float = 0.25) -> None:
+    """Pre-model look at the derived features: what they look like and how they track the outcome.
+
+    The lower-left panel is the one that matters. If `zone.edge_distance` described the zone umpires
+    actually call, every curve would cross 50% at zero.
+    """
+    from shadow_zone import eda
+
+    d = eda.add_derived(df)
+    fig, axes = plt.subplots(2, 2, figsize=(9.4, 7.0))
+
+    ax = axes[0, 0]
+    shown = d["edge_dist"].between(-1.0, 1.5)
+    ax.hist(d.loc[shown, "edge_dist"], bins=90, color="#1d3f63")
+    ax.axvspan(-shadow_ft, shadow_ft, color="#c2410c", alpha=0.18, label=f"shadow zone (+/- {shadow_ft} ft)")
+    ax.axvline(0, color="black", lw=0.8)
+    ax.set_xlabel(f"Signed distance to zone edge (ft); negative is inside\n"
+                  f"{100 * (1 - shown.mean()):.1f}% fall outside this range and are not drawn")
+    ax.set_ylabel("Taken pitches")
+    ax.set_title("Where taken pitches sit", fontsize=10)
+    ax.legend(fontsize=8)
+
+    ax = axes[0, 1]
+    ax.hist(d["sz_top"], bins=60, color="#1d3f63", alpha=0.85, label="sz_top")
+    ax.hist(d["sz_bot"], bins=60, color="#c2410c", alpha=0.85, label="sz_bot")
+    ax.set_xlabel("Height (ft)")
+    ax.set_ylabel("Taken pitches")
+    ax.set_title("Statcast's per-batter zone bounds", fontsize=10)
+    ax.legend(fontsize=8)
+
+    ax = axes[1, 0]
+    colors = {"high": "#c2410c", "low": "#1d3f63", "inside": "#2f7d32", "outside": "#7b3fa0"}
+    for region, part in d.groupby("region", observed=True):
+        g = eda.response_curve(part)
+        if len(g):
+            ax.plot(g["edge_dist_bin"], g["strike_rate"], lw=1.6, color=colors.get(str(region)), label=str(region))
+    ax.axhline(0.5, color="grey", lw=0.8, ls="--")
+    ax.axvline(0, color="black", lw=0.8)
+    ax.set_xlabel("Signed distance to zone edge (ft)")
+    ax.set_ylabel("Called-strike rate (raw)")
+    ax.set_title("Raw strike rate by side of the zone\ncurves would cross 50% at 0 if the geometry matched", fontsize=9)
+    ax.legend(fontsize=8)
+
+    ax = axes[1, 1]
+    t = eda.by_region(d)
+    t = t[t["split"] == "region"].sort_values("half_strike_in")
+    y = np.arange(len(t))
+    ax.barh(y, t["half_strike_in"], color=[colors.get(g, "#555") for g in t["group"]])
+    ax.set_yticks(y, t["group"], fontsize=9)
+    ax.axvline(0, color="black", lw=0.8)
+    ax.set_xlabel("Distance where umpires call 50% strikes (inches)")
+    ax.set_title("Negative: called zone is tighter than geometry", fontsize=9)
+
+    fig.tight_layout()
+    fig.savefig(path, dpi=110)
+    plt.close(fig)
+
+
 def edge_curves(df: pd.DataFrame, p: np.ndarray, path: str) -> None:
     """Observed and predicted strike rate against signed edge distance, in 0.05 ft steps (descriptive)."""
     d = df.assign(p=p, bin=np.round(df["edge_dist"] / 0.05) * 0.05)

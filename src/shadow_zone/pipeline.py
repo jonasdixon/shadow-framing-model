@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from shadow_zone import calibration, effects, reliability, runs, viz
+from shadow_zone import calibration, eda, effects, reliability, runs, viz
 from shadow_zone.data import integrity
 from shadow_zone.data.prepare import build_taken
 from shadow_zone.data.statcast import fetch_home_plate_umpires, load_cached
@@ -87,6 +87,22 @@ def run_all(taken: pd.DataFrame, out_dir: str, player_names: dict | None = None,
     train = taken.loc[taken["season"] == train_year].reset_index(drop=True)
     test = taken.loc[taken["season"] == test_year].reset_index(drop=True)
 
+    # Exploratory checks come first: they describe the derived features and test the zone geometry
+    # against the data without any model, so a failure here is visible before anything is fitted.
+    eda_rows, bounds = [], {}
+    for year, d in ((train_year, train), (test_year, test)):
+        part = eda.add_derived(d)
+        tbl = eda.by_region(part)
+        tbl.insert(0, "season", year)
+        eda_rows.append(tbl)
+        bounds[year] = eda.zone_bounds_check(part)
+        eda.feature_table(part).assign(season=year).to_csv(
+            tables / f"eda_feature_summary_{year}.csv", index=False
+        )
+    edge_geometry = pd.concat(eda_rows, ignore_index=True)
+    edge_geometry.to_csv(tables / "eda_edge_geometry.csv", index=False)
+    viz.feature_distributions(eda.add_derived(test), str(figs / "feature_distributions.png"), shadow_ft)
+
     scales = dict(DEFAULT_SCALES)
     if tune:
         scales, log = tune_scales(train)
@@ -136,6 +152,17 @@ def run_all(taken: pd.DataFrame, out_dir: str, player_names: dict | None = None,
         region = region.loc[region["pitches"] >= 100]
         region.round(3).to_csv(tables / f"catcher_region_residuals_{year}.csv", index=False)
 
+    summary["eda"] = {
+        "half_strike_distance_in": {
+            str(r["season"]): r["half_strike_in"]
+            for _, r in edge_geometry.loc[edge_geometry["split"] == "all"].iterrows()
+        },
+        "half_strike_distance_by_region_in": {
+            str(year): dict(zip(part["group"], part["half_strike_in"], strict=False))
+            for year, part in edge_geometry.loc[edge_geometry["split"] == "region"].groupby("season")
+        },
+        "zone_bounds": bounds,
+    }
     summary["reliability"] = {
         "split_half_catcher_train_season": reliability.split_half(train, scales, "catcher", min_pitches),
         "split_half_umpire_train_season": reliability.split_half(train, scales, "umpire", 500),

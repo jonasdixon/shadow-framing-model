@@ -50,6 +50,16 @@ tests plant a flipped side to confirm that it triggers.
 pitch type (intentional walks are no longer thrown), but automatic balls and strikes from pitch-clock
 violations exist as separate `automatic_*` descriptions and are excluded by construction.
 
+**The called zone is not the computed zone, and the error differs by side.** Reading the raw
+called-strike rate against `edge_dist` and finding where it crosses 50% gives +0.01 in (2023) and
++0.02 in (2024) over all taken pitches, so the ball-radius adjustment in `zone.py` is right on
+average. By side of the zone it is not: high -0.72 / -0.78 in, outside +0.59 / +0.67 in, low and
+inside within 0.15 in of zero. The aggregate passes only because the high and outside errors cancel.
+Umpires call the top tighter and the outside edge wider than the geometry says. The model absorbs
+this by interacting its edge spline with side of zone and batter handedness; the check is in
+`shadow_zone.eda` and the table in `reports/tables/eda_edge_geometry.csv`. The tests move the
+boundary by a known amount and confirm the check recovers it.
+
 ## Coverage
 
 | | 2023 | 2024 |
@@ -71,6 +81,9 @@ toward zero, but are left out of the published tables because their intervals ar
 - **Tracking accuracy at the edge.** Location error of a fraction of an inch matters most exactly where
   this model works. There is no second tracking source here to compare against.
 - **Batter zone bounds.** `sz_top` and `sz_bot` are Statcast's per-pitch estimates, not measurements
-  of that batter's knees and belt.
+  of that batter's knees and belt. The 50% crossing above shows `sz_top` runs about three quarters of
+  an inch above the top of the zone umpires call, but that cannot separate a biased estimate from
+  umpires genuinely calling the top of the zone small. Either way the model does not have to assume
+  the bound is right.
 - **Challenge and ABS rules.** Neither was in use in MLB regular-season games in 2023-24. A
   later season would need the call-source field.

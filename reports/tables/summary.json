@@ -54,6 +54,48 @@
   "batter": 0.2
  },
  "league_strike_value_runs": 0.12352988229441952,
+ "eda": {
+  "half_strike_distance_in": {
+   "2023": 0.01,
+   "2024": 0.02
+  },
+  "half_strike_distance_by_region_in": {
+   "2023": {
+    "high": -0.72,
+    "inside": 0.02,
+    "low": -0.07,
+    "outside": 0.59
+   },
+   "2024": {
+    "high": -0.78,
+    "inside": 0.13,
+    "low": -0.1,
+    "outside": 0.67
+   }
+  },
+  "zone_bounds": {
+   "2023": {
+    "sz_top_mean_ft": 3.3583,
+    "sz_top_sd_ft": 0.2054,
+    "sz_bot_mean_ft": 1.5935,
+    "sz_bot_sd_ft": 0.1216,
+    "zone_height_mean_ft": 1.7648,
+    "zone_height_sd_ft": 0.1285,
+    "nonpositive_height": 0,
+    "height_outside_1_to_3_ft": 0
+   },
+   "2024": {
+    "sz_top_mean_ft": 3.4067,
+    "sz_top_sd_ft": 0.2018,
+    "sz_bot_mean_ft": 1.6005,
+    "sz_bot_sd_ft": 0.1233,
+    "zone_height_mean_ft": 1.8062,
+    "zone_height_sd_ft": 0.1318,
+    "nonpositive_height": 0,
+    "height_outside_1_to_3_ft": 0
+   }
+  }
+ },
  "reliability": {
   "split_half_catcher_train_season": {
    "n_players": 64,

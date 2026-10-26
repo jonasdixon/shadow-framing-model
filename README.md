@@ -29,6 +29,45 @@ the time, and are 32% of all taken pitches. Inside that band, the person behind 
 
 ![Catcher framing runs, 2024](reports/figures/catcher_runs_2024.png)
 
+## Before the model: does the zone geometry match the zone umpires call?
+
+Every number above rests on one derived feature, `edge_distance`: the signed distance from the pitch
+to the rulebook zone grown by a ball radius. It is computed, not measured, so it is checked against
+the outcome before anything is fitted (`shadow_zone.eda`, figure below).
+
+Read the raw called-strike rate against edge distance and find where it crosses 50%. If the geometry
+described the zone umpires actually call, that crossing would sit at zero.
+
+![Derived features and the geometry check](reports/figures/feature_distributions.png)
+
+Over all taken pitches it does: **0.01 inches in 2023 and 0.02 in 2024**, which is as close to the
+computed boundary as this data can resolve. That is a real check on the ball-radius adjustment, and
+it passes.
+
+Split by side of the zone, it does not:
+
+| Side of the zone | 50% crossing, 2023 | 2024 |
+|---|---|---|
+| High | -0.72 in | -0.78 in |
+| Low | -0.07 in | -0.10 in |
+| Inside | +0.02 in | +0.13 in |
+| Outside | +0.59 in | +0.67 in |
+
+Umpires call the top of the zone about three quarters of an inch tighter than `sz_top` implies, and
+the outside edge about two thirds of an inch wider. The aggregate check passes only because those two
+errors point in opposite directions and cancel. Both seasons agree, so this is not noise.
+
+This matters for reading the catcher numbers. A catcher who receives a lot of pitches at the top of
+the zone works against a boundary that sits about three quarters of an inch off, and if the model
+treated the computed edge as correct everywhere, that offset would be charged to him. It is not: the
+edge spline in [`model.py`](src/shadow_zone/model.py) is fully interacted with side of zone and
+batter handedness (`edge_by_side`), so each of the eight side-by-hand combinations gets its own edge
+response and the geometry error is absorbed where it occurs. The check above is what tells you that
+interaction is doing real work rather than spending degrees of freedom.
+
+It also puts a number on something [docs/data_quality.md](docs/data_quality.md) previously listed as
+unchecked: `sz_top` behaves like an overestimate of the top of the called zone.
+
 ## Can the probabilities be trusted?
 
 On 2024 pitches the model never saw:
@@ -70,7 +109,7 @@ by game. The larger is used. The model-based one was larger for 2024 catchers (m
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -e '.[dev]'
-pytest                                   # 17 tests, includes a planted-effect recovery check
+pytest                                   # 30 tests, includes planted-effect and planted-geometry recovery
 python - <<'PY'
 from shadow_zone.data.sample import load_sample
 from shadow_zone.model import FramingModel
@@ -99,7 +138,9 @@ shadow-zone validate --data data/processed --out reports      # needs: pip insta
 - [docs/data_quality.md](docs/data_quality.md): what was wrong with the data and how it was handled.
 - [docs/design_decisions.md](docs/design_decisions.md): choices, rejected alternatives, weaknesses.
 - `reports/tables`: catcher and umpire effects by season, run values by count, tuning log, summary.json.
+- `reports/tables/eda_edge_geometry.csv`: where the called zone sits against the computed one, by side and season.
 - `notebooks/framing_walkthrough.ipynb`: exploratory checks on the derived features, then the fit.
+- [CONTRIBUTING.md](CONTRIBUTING.md): how to set up, test and propose a change.
 
 ## Data
 

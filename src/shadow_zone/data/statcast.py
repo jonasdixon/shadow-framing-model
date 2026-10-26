@@ -142,6 +142,7 @@ def fetch_home_plate_umpires(start: str, end: str, cache_dir: str | Path) -> pd.
 def fetch_player_names(ids, cache_dir: str | Path) -> dict:
     """Full names for MLB person ids (Statcast's `player_name` is the pitcher, so catchers need this)."""
     path = Path(cache_dir) / "player_names.parquet"
+    path.parent.mkdir(parents=True, exist_ok=True)
     known = pd.read_parquet(path) if path.exists() else pd.DataFrame(columns=["id", "name"])
     todo = sorted(set(int(i) for i in ids) - set(known["id"].astype(int)))
     rows = []

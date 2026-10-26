@@ -1,0 +1,15 @@
+season,split,group,n,half_strike_ft,half_strike_in
+2023,all,all,374319,0.0007,0.01
+2023,region,high,65365,-0.0597,-0.72
+2023,region,inside,67009,0.0014,0.02
+2023,region,low,108508,-0.0058,-0.07
+2023,region,outside,133437,0.0493,0.59
+2023,batter hand,L,158707,-0.003,-0.04
+2023,batter hand,R,215612,0.0034,0.04
+2024,all,all,366825,0.0018,0.02
+2024,region,high,62330,-0.0649,-0.78
+2024,region,inside,63371,0.0112,0.13
+2024,region,low,103519,-0.0082,-0.1
+2024,region,outside,137605,0.056,0.67
+2024,batter hand,L,159869,-0.0026,-0.03
+2024,batter hand,R,206956,0.0052,0.06

@@ -72,3 +72,7 @@ def main(argv=None) -> int:
     a = p.parse_args(argv)
     a.func(a)
     return 0
+
+
+if __name__ == "__main__":  # python -m shadow_zone.cli
+    raise SystemExit(main())
